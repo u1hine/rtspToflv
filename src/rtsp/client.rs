@@ -74,30 +74,20 @@ impl RtspClient {
 
     /// 启动 RTSP 拉流主循环
     ///
-    /// 包含完整的 连接→拉流→断开→重连 生命周期管理。
-    /// 此函数会一直运行，直到程序关闭 (broadcast channel 关闭)。
+    /// 持续运行，断连自动重连，不会主动退出 (服务常驻)。
+    /// 仅在程序收到 SIGTERM / Ctrl+C 时由 tokio task abort 停止。
     pub async fn run(mut self) {
         info!("RTSP 客户端启动，源地址: {}", self.config.rtsp_url);
 
         loop {
             match self.connect_and_stream().await {
-                Ok(()) => {
-                    warn!("RTSP 码流正常结束，准备重连...");
-                }
-                Err(e) => {
-                    error!("RTSP 连接/流错误: {e}，准备重连...");
-                }
+                Ok(()) => warn!("RTSP 码流正常结束，准备重连..."),
+                Err(e) => error!("RTSP 连接/流错误: {e}，准备重连..."),
             }
 
-            // 检查广播通道是否已关闭 (所有接收端断开)
-            if self.state.tx.receiver_count() == 0 {
-                info!("所有 HTTP 客户端已断开，停止拉流");
-                break;
-            }
-
-            // 等待退避时间后重连
+            // 等待退避时间后重连 (永不主动退出, 服务常驻)
             let wait = std::cmp::max(self.config.reconnect_interval, self.backoff_secs);
-            info!("{} 秒后重连 RTSP...", wait);
+            info!("{wait} 秒后重连 RTSP...");
             tokio::time::sleep(Duration::from_secs(wait)).await;
 
             // 指数退避: 翻倍，上限 max_backoff 秒
@@ -146,8 +136,8 @@ impl RtspClient {
         // ---- 第 4 步: PLAY (开始播放) ----
         // 使用 permissive 时间戳模式: 兼容 MediaMTX / 部分 IPC 摄像头
         // 这些设备在 PLAY 响应的 RTP-Info 头中不包含 rtptime 字段
-        let play_opts = PlayOptions::default()
-            .initial_timestamp(InitialTimestampPolicy::Permissive);
+        let play_opts =
+            PlayOptions::default().initial_timestamp(InitialTimestampPolicy::Permissive);
         let playing = session
             .play(play_opts)
             .await
@@ -173,36 +163,35 @@ impl RtspClient {
                     // `stream.parameters()` 仍然返回旧参数。新参数在当前帧被 pull 之后才安装。
                     // 因此需要在每一帧上都检查 `stream.parameters()`,
                     // 而非仅在 `has_new_parameters()` 为 true 时检查。
-                    if !avc_config_sent {
-                        if let Some(config_record) =
+                    if !avc_config_sent
+                        && let Some(config_record) =
                             get_video_extra_data(demuxed.streams(), video.stream_id())
-                        {
-                            info!(
-                                "AVC 解码器配置就绪: stream={}, len={}",
-                                video.stream_id(),
-                                config_record.len()
-                            );
+                    {
+                        info!(
+                            "AVC 解码器配置就绪: stream={}, len={}",
+                            video.stream_id(),
+                            config_record.len()
+                        );
 
-                            // 缓存到 AppState (新 HTTP 客户端连接时直接获取)
-                            self.state.update_avc_config(config_record.clone()).await;
+                        // 缓存到 AppState (新 HTTP 客户端连接时直接获取)
+                        self.state.update_avc_config(config_record.clone()).await;
 
-                            // 广播给已有 HTTP 客户端
-                            let msg = StreamMessage::AvcConfig { config_record };
-                            let _ = self.state.tx.send(msg);
-                            avc_config_sent = true;
-                        }
+                        // 广播给已有 HTTP 客户端
+                        let msg = StreamMessage::AvcConfig { config_record };
+                        let _ = self.state.tx.send(msg);
+                        avc_config_sent = true;
                     }
 
                     // SPS/PPS 变更时重新广播 (极少发生, 但需要处理)
-                    if avc_config_sent && video.has_new_parameters() {
-                        if let Some(config_record) =
+                    if avc_config_sent
+                        && video.has_new_parameters()
+                        && let Some(config_record) =
                             get_video_extra_data(demuxed.streams(), video.stream_id())
-                        {
-                            debug!("AVC 配置更新 (SPS/PPS 变更)");
-                            self.state.update_avc_config(config_record.clone()).await;
-                            let msg = StreamMessage::AvcConfig { config_record };
-                            let _ = self.state.tx.send(msg);
-                        }
+                    {
+                        debug!("AVC 配置更新 (SPS/PPS 变更)");
+                        self.state.update_avc_config(config_record.clone()).await;
+                        let msg = StreamMessage::AvcConfig { config_record };
+                        let _ = self.state.tx.send(msg);
                     }
 
                     let data = video.data();

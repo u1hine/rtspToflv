@@ -38,7 +38,7 @@ use std::net::SocketAddr;
 
 use clap::Parser;
 use tracing::{error, info};
-use tracing_subscriber::EnvFilter;
+use tracing_subscriber::{EnvFilter, fmt::writer::MakeWriterExt};
 
 use crate::config::Config;
 use crate::rtsp::client::RtspClient;
@@ -48,7 +48,6 @@ use crate::server::state::AppState;
 /// 广播通道容量: 64 条消息
 ///
 /// 在 25fps 下约 2.5 秒缓冲，足够容忍网络抖动。
-/// 注: 每条消息可能包含多个 FLV Tag。
 const BROADCAST_CAPACITY: usize = 64;
 
 #[tokio::main]
@@ -57,12 +56,33 @@ async fn main() {
     let config = Config::parse();
 
     // ---- 初始化日志系统 ----
-    tracing_subscriber::fmt()
-        .with_env_filter(
-            EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(&config.log_level)),
-        )
-        .with_target(false)
-        .init();
+    let filter =
+        EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(&config.log_level));
+
+    let builder = tracing_subscriber::fmt()
+        .with_env_filter(filter)
+        .with_target(false);
+
+    // 同时写到 stdout 和文件, 或单独写到一个目标
+    if let Some(ref log_file) = config.log_file {
+        let file = std::fs::File::create(log_file).unwrap_or_else(|e| {
+            eprintln!("无法创建日志文件 {log_file}: {e}");
+            std::process::exit(1);
+        });
+        if config.quiet {
+            // 静默模式: 只写文件
+            builder.with_writer(file).init();
+        } else {
+            // 同时输出到 stdout 和文件
+            builder.with_writer(std::io::stdout.and(file)).init();
+        }
+    } else if config.quiet {
+        // 静默模式无文件: 丢弃所有日志
+        builder.with_writer(std::io::sink).init();
+    } else {
+        // 默认: 输出到 stdout
+        builder.init();
+    }
 
     info!("rtsp-to-flv 启动");
     info!("RTSP 源: {}", config.rtsp_url);
