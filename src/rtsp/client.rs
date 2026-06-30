@@ -11,7 +11,9 @@ use std::time::Duration;
 
 use bytes::Bytes;
 use futures::StreamExt;
-use retina::client::{PlayOptions, Session, SessionOptions, SetupOptions, Transport};
+use retina::client::{
+    InitialTimestampPolicy, PlayOptions, Session, SessionOptions, SetupOptions, Transport,
+};
 use retina::codec::{CodecItem, ParametersRef};
 use tracing::{debug, error, info, warn};
 use url::Url;
@@ -142,8 +144,12 @@ impl RtspClient {
         }
 
         // ---- 第 4 步: PLAY (开始播放) ----
+        // 使用 permissive 时间戳模式: 兼容 MediaMTX / 部分 IPC 摄像头
+        // 这些设备在 PLAY 响应的 RTP-Info 头中不包含 rtptime 字段
+        let play_opts = PlayOptions::default()
+            .initial_timestamp(InitialTimestampPolicy::Permissive);
         let playing = session
-            .play(PlayOptions::default())
+            .play(play_opts)
             .await
             .map_err(|e| AppError::rtsp(format!("RTSP PLAY 失败: {e}")))?;
 
@@ -155,33 +161,47 @@ impl RtspClient {
         info!("RTSP 连接成功，开始拉流");
         self.backoff_secs = 1; // 重置退避
 
-        let mut _avc_config_sent = false;
+        let mut avc_config_sent = false;
 
         // ---- 第 6 步: 持续读取解包后的帧 ----
         while let Some(frame_result) = demuxed.next().await {
             match frame_result {
                 Ok(CodecItem::VideoFrame(video)) => {
-                    // 检查是否有新的解码器参数 (SPS/PPS 更新)
-                    if video.has_new_parameters() {
-                        // 获取视频流的参数和 extra_data
-                        let config_record =
-                            get_video_extra_data(demuxed.streams(), video.stream_id());
-                        if let Some(ref cr) = config_record {
-                            debug!(
-                                "新的 AVC 配置记录: stream={}, len={}",
+                    // 尝试获取 AVC 解码器配置。
+                    //
+                    // 注意: retina 的 `has_new_parameters()` 在当前帧上为 true 时,
+                    // `stream.parameters()` 仍然返回旧参数。新参数在当前帧被 pull 之后才安装。
+                    // 因此需要在每一帧上都检查 `stream.parameters()`,
+                    // 而非仅在 `has_new_parameters()` 为 true 时检查。
+                    if !avc_config_sent {
+                        if let Some(config_record) =
+                            get_video_extra_data(demuxed.streams(), video.stream_id())
+                        {
+                            info!(
+                                "AVC 解码器配置就绪: stream={}, len={}",
                                 video.stream_id(),
-                                cr.len()
+                                config_record.len()
                             );
 
-                            // 缓存 AVC 配置 (新客户端连接时直接获取)
-                            self.state.update_avc_config(cr.clone()).await;
+                            // 缓存到 AppState (新 HTTP 客户端连接时直接获取)
+                            self.state.update_avc_config(config_record.clone()).await;
 
-                            // 广播 AVC 配置给已有客户端
-                            let msg = StreamMessage::AvcConfig {
-                                config_record: cr.clone(),
-                            };
+                            // 广播给已有 HTTP 客户端
+                            let msg = StreamMessage::AvcConfig { config_record };
                             let _ = self.state.tx.send(msg);
-                            _avc_config_sent = true;
+                            avc_config_sent = true;
+                        }
+                    }
+
+                    // SPS/PPS 变更时重新广播 (极少发生, 但需要处理)
+                    if avc_config_sent && video.has_new_parameters() {
+                        if let Some(config_record) =
+                            get_video_extra_data(demuxed.streams(), video.stream_id())
+                        {
+                            debug!("AVC 配置更新 (SPS/PPS 变更)");
+                            self.state.update_avc_config(config_record.clone()).await;
+                            let msg = StreamMessage::AvcConfig { config_record };
+                            let _ = self.state.tx.send(msg);
                         }
                     }
 
