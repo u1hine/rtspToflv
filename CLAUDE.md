@@ -22,13 +22,44 @@ cargo fmt            # Format code
 
 ## Architecture
 
-_Project is in initial setup — no source modules exist yet._
+```
+IPC Camera (RTSP) → retina (RTP depacketize) → H.264 NALs / AAC frames
+    → broadcast channel → FlvMuxer (FLV封装) → axum (HTTP-FLV) → 浏览器/小程序
+```
 
-The core pipeline is expected to involve:
-- **RTSP client** — connecting to RTSP sources, handling RTP/RTCP transport
-- **Demuxing** — parsing RTP payloads (likely H.264/H.265 video, possibly AAC audio)
-- **FLV muxing** — remuxing elementary streams into FLV container format
-- **HTTP server** — likely serving FLV over HTTP (HTTP-FLV) for web consumption
+### Module Structure
+
+| Module | File | Purpose |
+|--------|------|---------|
+| Entry point | `src/main.rs` | CLI args, logging init, startup orchestration |
+| Config | `src/config.rs` | `Config` struct with clap derive — RTSP URL, port, log level, reconnect params |
+| Error | `src/error.rs` | `AppError` enum (Rtsp/Flv/Server/BroadcastClosed) via thiserror |
+| RTSP client | `src/rtsp/client.rs` | `RtspClient` — retina-based RTSP pull, auto-reconnect with exponential backoff |
+| FLV muxer | `src/flv/muxer.rs` | `FlvMuxer` — wraps oxideav-flv for header, metadata, video/audio tags |
+| HTTP server | `src/server/handler.rs` | `GET /live/:stream_name` — chunked HTTP-FLV streaming endpoint |
+| Shared state | `src/server/state.rs` | `AppState` — holds `tokio::sync::broadcast::Sender<StreamMessage>` |
+
+### Key Dependencies
+
+- **retina** 0.4 — pure-Rust RTSP client with built-in H.264/AAC depacketization
+- **oxideav-flv** 0.0.5 — pure-Rust FLV muxer (header, script, video/audio tags)
+- **axum** 0.8 — HTTP framework for HTTP-FLV streaming endpoint
+- **tokio** 1 — async runtime, broadcast channel for multi-client
+
+### Data Flow
+
+1. `RtspClient` connects via `Session::describe()` → `setup()` → `play()` → `demuxed()`
+2. `Demuxed` (implements `futures::Stream`) yields `CodecItem::VideoFrame` / `AudioFrame`
+3. Raw frame data + timestamps wrapped in `StreamMessage` enum and sent via `broadcast::Sender`
+4. Each HTTP client subscribes via `broadcast::Receiver`, independently runs `FlvMuxer` to produce FLV tags
+5. FLV tags written directly to HTTP response body as chunked `video/x-flv`
+
+### Usage
+
+```bash
+cargo run -- -u rtsp://admin:password@192.168.1.64:554/Streaming/Channels/101
+# Playback: http://127.0.0.1:8080/live/stream
+```
 
 ## Skill routing
 

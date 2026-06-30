@@ -1,0 +1,33 @@
+[package]
+name = "rtsp-to-flv"
+version = "0.1.0"
+edition = "2024"
+description = "RTSP to HTTP-FLV gateway — pulls RTSP streams from IPC cameras and serves as HTTP-FLV for web players"
+
+[dependencies]
+# 异步运行时
+tokio = { version = "1", features = ["full"] }
+# HTTP 服务框架
+axum = "0.8"
+# 命令行参数解析
+clap = { version = "4", features = ["derive", "env"] }
+# RTSP 客户端 (纯 Rust, 内置 H.264/AAC 解包)
+retina = "0.4"
+# FLV 封装库 (纯 Rust)
+oxideav-flv = "0.0.5"
+# 字节缓冲处理
+bytes = "1"
+# 日志
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+# 错误处理
+anyhow = "1"
+thiserror = "2"
+# 异步流 (用于 HTTP 响应体)
+async-stream = "0.3"
+# HTTP 类型
+http = "1"
+# URL 解析 (retina 需要)
+url = "2"
+# Futures (retina Demuxed 实现了 Stream trait)
+futures = "0.3"
