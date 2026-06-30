@@ -73,7 +73,7 @@ async fn main() {
     let state = AppState::new(config.clone(), BROADCAST_CAPACITY);
 
     // ---- 启动 RTSP 拉流任务 ----
-    let rtsp_client = RtspClient::new(config.clone(), state.tx.clone());
+    let rtsp_client = RtspClient::new(config.clone(), state.clone());
     let rtsp_handle = tokio::spawn(async move {
         rtsp_client.run().await;
     });

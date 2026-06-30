@@ -40,6 +40,9 @@ pub async fn live_handler(
 
     let mut rx = state.subscribe();
 
+    // 如果 RTSP 客户端已就绪，获取缓存的 AVC 配置
+    let cached_avc = state.get_avc_config().await;
+
     let stream = async_stream::stream! {
         let mut muxer = FlvMuxer::new();
         let mut avc_header_sent = false;
@@ -55,6 +58,20 @@ pub async fn live_handler(
             Ok(meta) => yield Ok(meta),
             Err(e) => {
                 warn!("onMetaData 生成失败: {e}");
+            }
+        }
+
+        // 第 3.5 步: 如果缓存中有 AVC 配置，直接发送 (避免等待 RTSP 客户端重新广播)
+        if let Some(ref config_record) = cached_avc {
+            match muxer.write_avc_sequence_header(config_record) {
+                Ok(tag) => {
+                    yield Ok(tag);
+                    avc_header_sent = true;
+                    debug!("AVC Sequence Header 已发送 (来自缓存, {} 字节)", config_record.len());
+                }
+                Err(e) => {
+                    warn!("AVC Sequence Header (缓存) 封装失败: {e}");
+                }
             }
         }
 

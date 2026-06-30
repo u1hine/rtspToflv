@@ -1,0 +1,55 @@
+[INFO] 2026-06-30T04:00:01.273Z handleHookRunStop started
+[INFO] 2026-06-30T04:00:01.345Z Hook input received
+[INFO] 2026-06-30T04:00:01.346Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Session ID: 21fe816b-b774-4d9e-8cb4-356afbbff18a
+[INFO] 2026-06-30T04:00:01.346Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Resolved pluginRoot: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153
+[INFO] 2026-06-30T04:00:01.346Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Resolved stateDir: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state
+[INFO] 2026-06-30T04:00:01.347Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Checking session file at: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md
+[INFO] 2026-06-30T04:00:01.349Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] No run associated with session — allowing exit
+[INFO] 2026-06-30T04:04:47.508Z handleHookRunStop started
+[INFO] 2026-06-30T04:04:47.512Z Hook input received
+[INFO] 2026-06-30T04:04:47.512Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Session ID: 21fe816b-b774-4d9e-8cb4-356afbbff18a
+[INFO] 2026-06-30T04:04:47.512Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Resolved pluginRoot: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153
+[INFO] 2026-06-30T04:04:47.513Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Resolved stateDir: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state
+[INFO] 2026-06-30T04:04:47.513Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Checking session file at: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md
+[INFO] 2026-06-30T04:04:47.514Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Primary state file not found, trying fallback: D:\rtspToflv\.a5c\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md
+[INFO] 2026-06-30T04:04:47.514Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] No active loop found at primary (C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md) or fallback (D:\rtspToflv\.a5c\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md) — allowing exit
+[INFO] 2026-06-30T05:12:56.489Z handleHookRunStop started
+[INFO] 2026-06-30T05:12:56.494Z Hook input received
+[INFO] 2026-06-30T05:12:56.494Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Session ID: 21fe816b-b774-4d9e-8cb4-356afbbff18a
+[INFO] 2026-06-30T05:12:56.494Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Resolved pluginRoot: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153
+[INFO] 2026-06-30T05:12:56.495Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Resolved stateDir: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state
+[INFO] 2026-06-30T05:12:56.495Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Checking session file at: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md
+[INFO] 2026-06-30T05:12:56.496Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Primary state file not found, trying fallback: D:\rtspToflv\.a5c\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md
+[INFO] 2026-06-30T05:12:56.496Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] No active loop found at primary (C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md) or fallback (D:\rtspToflv\.a5c\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md) — allowing exit
+[INFO] 2026-06-30T05:20:11.954Z handleHookRunStop started
+[INFO] 2026-06-30T05:20:11.958Z Hook input received
+[INFO] 2026-06-30T05:20:11.958Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Session ID: 21fe816b-b774-4d9e-8cb4-356afbbff18a
+[INFO] 2026-06-30T05:20:11.958Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Resolved pluginRoot: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153
+[INFO] 2026-06-30T05:20:11.959Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Resolved stateDir: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state
+[INFO] 2026-06-30T05:20:11.959Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Checking session file at: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md
+[INFO] 2026-06-30T05:20:11.960Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Primary state file not found, trying fallback: D:\rtspToflv\.a5c\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md
+[INFO] 2026-06-30T05:20:11.960Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] No active loop found at primary (C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md) or fallback (D:\rtspToflv\.a5c\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md) — allowing exit
+[INFO] 2026-06-30T06:09:48.261Z handleHookRunStop started
+[INFO] 2026-06-30T06:09:48.267Z Hook input received
+[INFO] 2026-06-30T06:09:48.267Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Session ID: 21fe816b-b774-4d9e-8cb4-356afbbff18a
+[INFO] 2026-06-30T06:09:48.267Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Resolved pluginRoot: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153
+[INFO] 2026-06-30T06:09:48.268Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Resolved stateDir: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state
+[INFO] 2026-06-30T06:09:48.268Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Checking session file at: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md
+[INFO] 2026-06-30T06:09:48.269Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Primary state file not found, trying fallback: D:\rtspToflv\.a5c\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md
+[INFO] 2026-06-30T06:09:48.269Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] No active loop found at primary (C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md) or fallback (D:\rtspToflv\.a5c\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md) — allowing exit
+[INFO] 2026-06-30T06:21:10.189Z handleHookRunStop started
+[INFO] 2026-06-30T06:21:10.194Z Hook input received
+[INFO] 2026-06-30T06:21:10.194Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Session ID: 21fe816b-b774-4d9e-8cb4-356afbbff18a
+[INFO] 2026-06-30T06:21:10.194Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Resolved pluginRoot: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153
+[INFO] 2026-06-30T06:21:10.195Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Resolved stateDir: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state
+[INFO] 2026-06-30T06:21:10.195Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Checking session file at: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md
+[INFO] 2026-06-30T06:21:10.196Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Primary state file not found, trying fallback: D:\rtspToflv\.a5c\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md
+[INFO] 2026-06-30T06:21:10.196Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] No active loop found at primary (C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md) or fallback (D:\rtspToflv\.a5c\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md) — allowing exit
+[INFO] 2026-06-30T06:52:21.899Z handleHookRunStop started
+[INFO] 2026-06-30T06:52:21.904Z Hook input received
+[INFO] 2026-06-30T06:52:21.904Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Session ID: 21fe816b-b774-4d9e-8cb4-356afbbff18a
+[INFO] 2026-06-30T06:52:21.905Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Resolved pluginRoot: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153
+[INFO] 2026-06-30T06:52:21.905Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Resolved stateDir: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state
+[INFO] 2026-06-30T06:52:21.905Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Checking session file at: C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md
+[INFO] 2026-06-30T06:52:21.906Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] Primary state file not found, trying fallback: D:\rtspToflv\.a5c\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md
+[INFO] 2026-06-30T06:52:21.906Z [session=21fe816b-b774-4d9e-8cb4-356afbbff18a] No active loop found at primary (C:\Users\u0hine\.claude\plugins\cache\a5c-ai\babysitter\4.0.153\skills\babysit\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md) or fallback (D:\rtspToflv\.a5c\state/21fe816b-b774-4d9e-8cb4-356afbbff18a.md) — allowing exit

@@ -13,12 +13,12 @@ use bytes::Bytes;
 use futures::StreamExt;
 use retina::client::{PlayOptions, Session, SessionOptions, SetupOptions, Transport};
 use retina::codec::{CodecItem, ParametersRef};
-use tokio::sync::broadcast;
 use tracing::{debug, error, info, warn};
 use url::Url;
 
 use crate::config::Config;
 use crate::error::AppError;
+use crate::server::state::AppState;
 
 /// 内部消息类型 —— 通过 broadcast channel 传递
 #[derive(Debug, Clone)]
@@ -54,18 +54,18 @@ pub enum StreamMessage {
 pub struct RtspClient {
     /// 运行配置
     config: Config,
-    /// 流消息广播发送端
-    tx: broadcast::Sender<StreamMessage>,
+    /// 共享应用状态 (广播发送端 + AVC 配置缓存)
+    state: AppState,
     /// 当前退避时间 (秒)，成功连接后重置为 1
     backoff_secs: u64,
 }
 
 impl RtspClient {
     /// 创建新的 RTSP 客户端
-    pub fn new(config: Config, tx: broadcast::Sender<StreamMessage>) -> Self {
+    pub fn new(config: Config, state: AppState) -> Self {
         Self {
             config,
-            tx,
+            state,
             backoff_secs: 1,
         }
     }
@@ -88,7 +88,7 @@ impl RtspClient {
             }
 
             // 检查广播通道是否已关闭 (所有接收端断开)
-            if self.tx.receiver_count() == 0 {
+            if self.state.tx.receiver_count() == 0 {
                 info!("所有 HTTP 客户端已断开，停止拉流");
                 break;
             }
@@ -173,14 +173,14 @@ impl RtspClient {
                                 cr.len()
                             );
 
-                            // 广播 AVC 配置给所有客户端
+                            // 缓存 AVC 配置 (新客户端连接时直接获取)
+                            self.state.update_avc_config(cr.clone()).await;
+
+                            // 广播 AVC 配置给已有客户端
                             let msg = StreamMessage::AvcConfig {
                                 config_record: cr.clone(),
                             };
-                            if self.tx.send(msg).is_err() {
-                                info!("广播通道已关闭，停止拉流");
-                                return Ok(());
-                            }
+                            let _ = self.state.tx.send(msg);
                             _avc_config_sent = true;
                         }
                     }
@@ -203,10 +203,8 @@ impl RtspClient {
                             timestamp_ms: ts_ms,
                             is_keyframe,
                         };
-                        if self.tx.send(msg).is_err() {
-                            info!("广播通道已关闭，停止拉流");
-                            return Ok(());
-                        }
+                        // 无接收端时静默跳过
+                        let _ = self.state.tx.send(msg);
                     }
                 }
                 Ok(CodecItem::AudioFrame(audio)) => {
@@ -221,10 +219,8 @@ impl RtspClient {
                             data: Bytes::copy_from_slice(data),
                             timestamp_ms: ts_ms,
                         };
-                        if self.tx.send(msg).is_err() {
-                            info!("广播通道已关闭，停止拉流");
-                            return Ok(());
-                        }
+                        // 无接收端时静默跳过
+                        let _ = self.state.tx.send(msg);
                     }
                 }
                 Ok(CodecItem::Rtcp(_)) => {
