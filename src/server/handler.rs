@@ -114,8 +114,10 @@ pub async fn live_handler(
                 }
                 Err(RecvError::Lagged(skipped)) => {
                     warn!("HTTP 客户端落后，跳过 {skipped} 条消息");
-                    // FLV 播放器可以容忍丢帧，继续读取最新数据
-                    avc_header_sent = false; // 需要等待下一个 AVC 配置
+                    // FLV 播放器可以容忍丢帧，继续读取最新数据。
+                    // 注意: 不重置 avc_header_sent，因为 AVC 配置已在 lag 之前接收，
+                    // 且 RTSP 客户端仅在 SPS/PPS 变更时才重新发送 (极少发生)。
+                    // 重置会导致后续所有音视频帧被永久跳过。
                     continue;
                 }
                 Err(RecvError::Closed) => {
